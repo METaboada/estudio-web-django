@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Estudio Contable - Sistema Web{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #2c2c2c;
+            --accent-color: #007bff;
+            --text-light: #f8f9fa;
+        }
+        
+        body {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background-color: var(--secondary-color) !important;
+            border-bottom: 2px solid var(--accent-color);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--text-light) !important;
+        }
+        
+        .card {
+            background-color: var(--secondary-color);
+            border: 1px solid #444;
+        }
+        
+        .card-header {
+            background-color: var(--accent-color);
+            color: var(--text-light);
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        
+        .table-dark {
+            background-color: var(--secondary-color);
+        }
+        
+        .form-control, .form-select {
+            background-color: var(--secondary-color);
+            border-color: #444;
+            color: var(--text-light);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: var(--secondary-color);
+            border-color: var(--accent-color);
+            color: var(--text-light);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .pagination .page-link {
+            background-color: var(--secondary-color);
+            border-color: #444;
+            color: var(--text-light);
+        }
+        
+        .pagination .page-link:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: var(--text-light);
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home:index' %}">
+                <i class="fas fa-calculator me-2"></i>
+                Estudio Contable
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'clientes:lista' %}">
+                            <i class="fas fa-users me-1"></i>
+                            Clientes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-cogs me-1"></i>
+                            Procesos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-file-invoice me-1"></i>
+                            AFIP
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>
+                            {% if user.is_authenticated %}{{ user.username }}{% else %}Usuario{% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            {% if user.is_authenticated %}
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+                                    <i class="fas fa-cog me-1"></i>Panel Admin
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'admin:logout' %}">
+                                    <i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión
+                                </a></li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="{% url 'admin:login' %}">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Iniciar Sesión
+                                </a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="container mt-4">
+        {% block breadcrumb %}{% endblock %}
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-center text-light py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">
+                &copy; {% now "Y" %} Estudio Contable - Sistema de Gestión Web
+                <small class="text-muted ms-2">
+                    Desarrollado con Django {{ django_version }}
+                </small>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

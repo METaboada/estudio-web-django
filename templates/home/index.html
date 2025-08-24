@@ -1,0 +1,323 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Taboada y Asociados - Estudio Contable{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.03"><circle cx="30" cy="30" r="2"/></g></svg>');
+        pointer-events: none;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .stats-number {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-label {
+        font-size: 1.1rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-detail {
+        font-size: 0.9rem;
+        color: #adb5bd;
+    }
+    
+    .access-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .access-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .access-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .access-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #2c3e50;
+    }
+    
+    .access-description {
+        color: #6c757d;
+        line-height: 1.6;
+    }
+    
+    .section-title {
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+    
+    .section-title h2 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+    
+    .section-subtitle {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+    
+    .stats-clientes { color: #28a745; }
+    .stats-activos { color: #ffc107; }
+    .stats-inactivos { color: #dc3545; }
+    
+    .brand-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.8;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container hero-content">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-3 mb-4">
+                    <i class="fas fa-balance-scale me-3"></i>
+                    Taboada y Asociados
+                </h1>
+                <p class="brand-subtitle">Estudio Contable</p>
+                <p class="lead mb-4">
+                    Sistema integral de gestión para clientes y servicios contables. 
+                    Administra eficientemente todos los aspectos de tu estudio profesional.
+                </p>
+            </div>
+            <div class="col-lg-4 text-center">
+                <i class="fas fa-building fa-8x opacity-25"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas Rápidas -->
+<div class="container mb-5">
+    <div class="section-title">
+        <h2>Panel de Control</h2>
+        <p class="section-subtitle">Estadísticas generales del estudio</p>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="stats-number stats-clientes">{{ total_clientes }}</div>
+                <div class="stats-label">Total Clientes</div>
+                <div class="stats-detail">
+                    {{ clientes_activos }} activos | {{ clientes_inactivos }} inactivos
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="stats-number stats-activos">{{ clientes_activos }}</div>
+                <div class="stats-label">Clientes Activos</div>
+                <div class="stats-detail">
+                    {% if total_clientes > 0 %}
+                        {% widthratio clientes_activos total_clientes 100 as porcentaje_activos %}
+                        {{ clientes_activos }} de {{ total_clientes }} ({{ porcentaje_activos }}%)
+                    {% else %}
+                        0%
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="stats-number stats-inactivos">{{ clientes_inactivos }}</div>
+                <div class="stats-label">Clientes Inactivos</div>
+                <div class="stats-detail">
+                    {% if total_clientes > 0 %}
+                        {% widthratio clientes_inactivos total_clientes 100 as porcentaje_inactivos %}
+                        {{ clientes_inactivos }} de {{ total_clientes }} ({{ porcentaje_inactivos }}%)
+                    {% else %}
+                        0%
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Accesos Rápidos -->
+<div class="container mb-5">
+    <div class="section-title">
+        <h2>Accesos Rápidos</h2>
+        <p class="section-subtitle">Navega rápidamente a las diferentes secciones del sistema</p>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-lg-4 col-md-6">
+            <a href="{% url 'clientes:lista' %}" class="access-card">
+                <div class="access-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="access-title">Gestión de Clientes</div>
+                <div class="access-description">
+                    Administra la información de tus clientes, sus datos fiscales, 
+                    claves de acceso y documentación importante.
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <a href="{% url 'clientes:crear' %}" class="access-card">
+                <div class="access-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="access-title">Nuevo Cliente</div>
+                <div class="access-description">
+                    Registra un nuevo cliente en el sistema con toda 
+                    su información fiscal y de contacto.
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <a href="#" class="access-card" onclick="alert('Próximamente: Documentos')">
+                <div class="access-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="access-title">Documentos</div>
+                <div class="access-description">
+                    Gestiona documentos, contratos, escrituras y 
+                    archivos digitales organizados por cliente.
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <a href="#" class="access-card" onclick="alert('Próximamente: Reportes')">
+                <div class="access-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="access-title">Reportes</div>
+                <div class="access-description">
+                    Genera reportes estadísticos, listados de clientes 
+                    y análisis de datos del estudio.
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-4 col-md-6">
+            <a href="/admin/" class="access-card" target="_blank">
+                <div class="access-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div class="access-title">Administración</div>
+                <div class="access-description">
+                    Accede al panel de administración de Django 
+                    para configuraciones avanzadas del sistema.
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Animación de números en las estadísticas
+document.addEventListener('DOMContentLoaded', function() {
+    const statsNumbers = document.querySelectorAll('.stats-number');
+    
+    const animateNumber = (element, target) => {
+        const increment = target / 50;
+        let current = 0;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            element.textContent = Math.floor(current);
+        }, 30);
+    };
+    
+    // Usar Intersection Observer para animar cuando sea visible
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = parseInt(entry.target.textContent);
+                animateNumber(entry.target, target);
+                observer.unobserve(entry.target);
+            }
+        });
+    });
+    
+    statsNumbers.forEach(number => observer.observe(number));
+});
+</script>
+{% endblock %}

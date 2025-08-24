@@ -1,0 +1,483 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Detalle Cliente - {{ cliente.nombre }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cliente-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    
+    .info-card-header {
+        background: #f8f9fa;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .info-card-body {
+        padding: 1.5rem;
+    }
+    
+    .info-row {
+        display: flex;
+        margin-bottom: 1rem;
+        align-items: flex-start;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+        min-width: 200px;
+        margin-right: 1rem;
+    }
+    
+    .info-value {
+        flex: 1;
+        color: #6c757d;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .empty-value {
+        color: #adb5bd;
+        font-style: italic;
+    }
+    
+    .btn-action {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .password-field {
+        font-family: 'Courier New', monospace;
+        background-color: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 4px;
+        border: 1px solid #dee2e6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="container-fluid">
+    <!-- Header del Cliente -->
+    <div class="cliente-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1 class="mb-2">{{ cliente.nombre }}</h1>
+                <p class="mb-0 opacity-75">CUIT: {{ cliente.cuit }}</p>
+                <p class="mb-0 opacity-75">
+                    <small>Cliente desde: {{ cliente.fecha_creacion|date:"d/m/Y" }}</small>
+                </p>
+            </div>
+            <div>
+                <span class="status-badge {% if cliente.activo %}status-active{% else %}status-inactive{% endif %}">
+                    {% if cliente.activo %}Activo{% else %}Inactivo{% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Botones de Acción -->
+    <div class="mb-4">
+        <a href="{% url 'clientes:lista' %}" class="btn btn-secondary btn-action">
+            <i class="fas fa-arrow-left"></i> Volver a la Lista
+        </a>
+        <a href="{% url 'clientes:editar' cliente.pk %}" class="btn btn-primary btn-action">
+            <i class="fas fa-edit"></i> Editar Cliente
+        </a>
+        <button type="button" class="btn btn-warning btn-action" onclick="toggleActivo({{ cliente.pk }})">
+            <i class="fas fa-power-off"></i> {% if cliente.activo %}Desactivar{% else %}Activar{% endif %}
+        </button>
+        <button type="button" class="btn btn-danger btn-action" onclick="eliminarCliente({{ cliente.pk }})">
+            <i class="fas fa-trash"></i> Eliminar
+        </button>
+    </div>
+    
+    <div class="row">
+        <!-- Información Básica -->
+        <div class="col-md-6">
+            <div class="info-card">
+                <div class="info-card-header">
+                    <i class="fas fa-user"></i> Información Básica
+                </div>
+                <div class="info-card-body">
+                    <div class="info-row">
+                        <div class="info-label">Nombre/Razón Social:</div>
+                        <div class="info-value">{{ cliente.nombre }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">CUIT:</div>
+                        <div class="info-value">{{ cliente.cuit }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Domicilio:</div>
+                        <div class="info-value">
+                            {% if cliente.domicilio %}
+                                {{ cliente.domicilio }}
+                            {% else %}
+                                <span class="empty-value">No especificado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Estado:</div>
+                        <div class="info-value">
+                            <span class="status-badge {% if cliente.activo %}status-active{% else %}status-inactive{% endif %}">
+                                {% if cliente.activo %}Activo{% else %}Inactivo{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información Técnica -->
+        <div class="col-md-6">
+            <div class="info-card">
+                <div class="info-card-header">
+                    <i class="fas fa-cog"></i> Información Técnica
+                </div>
+                <div class="info-card-body">
+                    <div class="info-row">
+                        <div class="info-label">Carpeta:</div>
+                        <div class="info-value">
+                            {% if cliente.carpeta %}
+                                {{ cliente.carpeta }}
+                            {% else %}
+                                <span class="empty-value">No especificada</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Punto de Venta:</div>
+                        <div class="info-value">
+                            {% if cliente.ptovta %}
+                                {{ cliente.ptovta }}
+                            {% else %}
+                                <span class="empty-value">No especificado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Nombre Base:</div>
+                        <div class="info-value">
+                            {% if cliente.nombase %}
+                                {{ cliente.nombase }}
+                            {% else %}
+                                <span class="empty-value">No especificado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Ruta Base:</div>
+                        <div class="info-value">
+                            {% if cliente.ruta_base %}
+                                <code>{{ cliente.ruta_base }}</code>
+                            {% else %}
+                                <span class="empty-value">No especificada</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Ruta Backup:</div>
+                        <div class="info-value">
+                            {% if cliente.rutabackup %}
+                                <code>{{ cliente.rutabackup }}</code>
+                            {% else %}
+                                <span class="empty-value">No especificada</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Registro Empleadores:</div>
+                        <div class="info-value">
+                            {% if cliente.registro_de_empleadores %}
+                                {{ cliente.registro_de_empleadores }}
+                            {% else %}
+                                <span class="empty-value">No especificado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Claves de Acceso -->
+    <div class="row">
+        <div class="col-12">
+            <div class="info-card">
+                <div class="info-card-header">
+                    <i class="fas fa-key"></i> Claves de Acceso a Sistemas
+                    <small class="text-muted ml-2">(Información sensible)</small>
+                </div>
+                <div class="info-card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Clave Fiscal (AFIP):</div>
+                                <div class="info-value">
+                                    {% if cliente.clave_fiscal %}
+                                        <div class="password-field">{{ cliente.clave_fiscal }}</div>
+                                    {% else %}
+                                        <span class="empty-value">No configurada</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Clave Ciudad (CABA):</div>
+                                <div class="info-value">
+                                    {% if cliente.clave_ciudad %}
+                                        <div class="password-field">{{ cliente.clave_ciudad }}</div>
+                                    {% else %}
+                                        <span class="empty-value">No configurada</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Clave ARBA:</div>
+                                <div class="info-value">
+                                    {% if cliente.clave_arba %}
+                                        <div class="password-field">{{ cliente.clave_arba }}</div>
+                                    {% else %}
+                                        <span class="empty-value">No configurada</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Clave SEC:</div>
+                                <div class="info-value">
+                                    {% if cliente.clave_sec %}
+                                        <div class="password-field">{{ cliente.clave_sec }}</div>
+                                    {% else %}
+                                        <span class="empty-value">No configurada</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Clave FAECYS:</div>
+                                <div class="info-value">
+                                    {% if cliente.clave_faecys %}
+                                        <div class="password-field">{{ cliente.clave_faecys }}</div>
+                                    {% else %}
+                                        <span class="empty-value">No configurada</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Clave INACAP:</div>
+                                <div class="info-value">
+                                    {% if cliente.clave_inacap %}
+                                        <div class="password-field">{{ cliente.clave_inacap }}</div>
+                                    {% else %}
+                                        <span class="empty-value">No configurada</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Clave OSECAC:</div>
+                                <div class="info-value">
+                                    {% if cliente.clave_osecac %}
+                                        <div class="password-field">{{ cliente.clave_osecac }}</div>
+                                    {% else %}
+                                        <span class="empty-value">No configurada</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Rúbrica Digital CABA:</div>
+                                <div class="info-value">
+                                    {% if cliente.clave_rubrica_digital_caba %}
+                                        <div class="password-field">{{ cliente.clave_rubrica_digital_caba }}</div>
+                                    {% else %}
+                                        <span class="empty-value">No configurada</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Estudio One Web:</div>
+                                <div class="info-value">
+                                    {% if cliente.clave_estudio_one_web %}
+                                        <div class="password-field">{{ cliente.clave_estudio_one_web }}</div>
+                                    {% else %}
+                                        <span class="empty-value">No configurada</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Otros Datos -->
+    {% if cliente.otros_datos %}
+    <div class="row">
+        <div class="col-12">
+            <div class="info-card">
+                <div class="info-card-header">
+                    <i class="fas fa-sticky-note"></i> Otros Datos
+                </div>
+                <div class="info-card-body">
+                    <div class="info-value">
+                        <pre style="white-space: pre-wrap; font-family: inherit;">{{ cliente.otros_datos }}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Información de Auditoría -->
+    <div class="row">
+        <div class="col-12">
+            <div class="info-card">
+                <div class="info-card-header">
+                    <i class="fas fa-history"></i> Información de Auditoría
+                </div>
+                <div class="info-card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Fecha de Creación:</div>
+                                <div class="info-value">{{ cliente.fecha_creacion|date:"d/m/Y H:i:s" }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-row">
+                                <div class="info-label">Última Modificación:</div>
+                                <div class="info-value">{{ cliente.fecha_modificacion|date:"d/m/Y H:i:s" }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar -->
+<div class="modal fade" id="eliminarModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar el cliente <strong>{{ cliente.nombre }}</strong>?</p>
+                <p class="text-danger"><small>Esta acción no se puede deshacer.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmarEliminar">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Obtener el token CSRF
+function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+}
+
+function toggleActivo(clienteId) {
+    if (confirm('¿Está seguro que desea cambiar el estado del cliente?')) {
+        fetch(`/clientes/api/clientes/${clienteId}/toggle_activo/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCsrfToken(),
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('Error al cambiar el estado del cliente');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al procesar la solicitud');
+        });
+    }
+}
+
+function eliminarCliente(clienteId) {
+    $('#eliminarModal').modal('show');
+    
+    document.getElementById('confirmarEliminar').onclick = function() {
+        fetch(`/clientes/clientes/${clienteId}/eliminar/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCsrfToken(),
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            $('#eliminarModal').modal('hide');
+            if (data.success) {
+                alert(data.message);
+                window.location.href = '{% url "clientes:lista" %}';
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al eliminar el cliente');
+            $('#eliminarModal').modal('hide');
+        });
+    };
+}
+
+// Asegurar que el token CSRF esté disponible
+document.addEventListener('DOMContentLoaded', function() {
+    // El token se maneja por la función getCsrfToken()
+});
+</script>
+{% endblock %}

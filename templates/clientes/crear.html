@@ -1,0 +1,295 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Crear Cliente - Estudio Contable{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background: var(--bs-dark);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--bs-border-color);
+    }
+    
+    .form-section {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .section-title {
+        color: var(--bs-primary);
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--bs-primary);
+    }
+    
+    .form-control:focus {
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .btn-group-actions {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="form-container">
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="text-primary mb-1">
+                            <i class="fas fa-user-plus me-2"></i>Nuevo Cliente
+                        </h2>
+                        <p class="text-muted mb-0">Complete los datos del nuevo cliente</p>
+                    </div>
+                    <a href="{% url 'clientes:lista' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Volver
+                    </a>
+                </div>
+
+                <!-- Formulario -->
+                <form method="post" id="clienteForm">
+                    {% csrf_token %}
+                    
+                    <!-- Datos Principales -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-user me-2"></i>Datos Principales
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_cuit" class="form-label">CUIT *</label>
+                                <input type="text" class="form-control" id="id_cuit" name="cuit" 
+                                       placeholder="20-12345678-9" maxlength="13" required>
+                                <div class="form-text">Formato: XX-XXXXXXXX-X</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_condicion_iva" class="form-label">Condición IVA</label>
+                                <select class="form-select" id="id_condicion_iva" name="condicion_iva">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="RI">Responsable Inscripto</option>
+                                    <option value="MT">Monotributo</option>
+                                    <option value="EX">Exento</option>
+                                    <option value="CF">Consumidor Final</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="id_razon_social" class="form-label">Razón Social *</label>
+                                <input type="text" class="form-control" id="id_razon_social" name="razon_social" 
+                                       placeholder="Ingrese la razón social" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_nombre_fantasia" class="form-label">Nombre Fantasía</label>
+                                <input type="text" class="form-control" id="id_nombre_fantasia" name="nombre_fantasia" 
+                                       placeholder="Nombre comercial">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_estado" class="form-label">Estado</label>
+                                <select class="form-select" id="id_estado" name="estado">
+                                    <option value="ACTIVO" selected>Activo</option>
+                                    <option value="INACTIVO">Inactivo</option>
+                                    <option value="SUSPENDIDO">Suspendido</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datos de Contacto -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-address-book me-2"></i>Datos de Contacto
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_telefono" class="form-label">Teléfono</label>
+                                <input type="text" class="form-control" id="id_telefono" name="telefono" 
+                                       placeholder="Número de teléfono">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="id_email" name="email" 
+                                       placeholder="correo@ejemplo.com">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="id_domicilio" class="form-label">Domicilio</label>
+                                <input type="text" class="form-control" id="id_domicilio" name="domicilio" 
+                                       placeholder="Dirección completa">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="id_codigo_postal" class="form-label">Código Postal</label>
+                                <input type="text" class="form-control" id="id_codigo_postal" name="codigo_postal" 
+                                       placeholder="XXXX">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_localidad" class="form-label">Localidad</label>
+                                <input type="text" class="form-control" id="id_localidad" name="localidad" 
+                                       placeholder="Ciudad/Localidad">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="id_provincia" class="form-label">Provincia</label>
+                                <input type="text" class="form-control" id="id_provincia" name="provincia" 
+                                       placeholder="Provincia">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Claves AFIP -->
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-key me-2"></i>Claves AFIP
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_clave_fiscal" class="form-label">Clave Fiscal</label>
+                                <input type="password" class="form-control" id="id_clave_fiscal" name="clave_fiscal" 
+                                       placeholder="Clave fiscal AFIP">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_clave_certificado" class="form-label">Clave Certificado</label>
+                                <input type="password" class="form-control" id="id_clave_certificado" name="clave_certificado" 
+                                       placeholder="Clave del certificado">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="id_observaciones" class="form-label">Observaciones</label>
+                                <textarea class="form-control" id="id_observaciones" name="observaciones" 
+                                          rows="3" placeholder="Observaciones adicionales"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="btn-group-actions">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <button type="button" class="btn btn-outline-secondary me-2" onclick="limpiarFormulario()">
+                                    <i class="fas fa-eraser me-2"></i>Limpiar
+                                </button>
+                            </div>
+                            <div>
+                                <a href="{% url 'clientes:lista' %}" class="btn btn-secondary me-2">
+                                    <i class="fas fa-times me-2"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Guardar Cliente
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Formatear CUIT mientras se escribe
+    const cuitInput = document.getElementById('id_cuit');
+    cuitInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length >= 2) {
+            value = value.substring(0, 2) + '-' + value.substring(2);
+        }
+        if (value.length >= 12) {
+            value = value.substring(0, 12) + '-' + value.substring(12, 13);
+        }
+        e.target.value = value;
+    });
+
+    // Validar formulario
+    const form = document.getElementById('clienteForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validar CUIT
+        const cuit = cuitInput.value;
+        if (cuit && !validarCuit(cuit)) {
+            Swal.fire({
+                title: 'Error',
+                text: 'El CUIT ingresado no es válido',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Confirmar creación
+        Swal.fire({
+            title: '¿Crear cliente?',
+            text: 'Se creará un nuevo cliente con los datos ingresados',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, crear',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Enviar formulario
+                form.submit();
+            }
+        });
+    });
+});
+
+function limpiarFormulario() {
+    Swal.fire({
+        title: '¿Limpiar formulario?',
+        text: 'Se perderán todos los datos ingresados',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, limpiar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('clienteForm').reset();
+        }
+    });
+}
+
+function validarCuit(cuit) {
+    // Remover guiones
+    const cleanCuit = cuit.replace(/-/g, '');
+    
+    if (cleanCuit.length !== 11) return false;
+    
+    // Validar dígito verificador
+    const digits = cleanCuit.split('').map(Number);
+    const multipliers = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+    
+    let sum = 0;
+    for (let i = 0; i < 10; i++) {
+        sum += digits[i] * multipliers[i];
+    }
+    
+    const remainder = sum % 11;
+    const checkDigit = remainder < 2 ? remainder : 11 - remainder;
+    
+    return checkDigit === digits[10];
+}
+</script>
+{% endblock %}
